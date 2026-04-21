@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+</head>
+<body>
+
+
+<div style="position: absolute; top: 10px; right: 30px; text-align: right;">
+    {% if user.is_authenticated %}
+        <p>Přihlášen jako: {{ user.username }}</p>
+
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Odhlásit se</button>
+        </form>
+    {% endif %}
+</div>
+
+<h1>Moje úkoly</h1>
+
+<h2>Filtr</h2>
+
+<form method="get">
+    <label>Stav:</label>
+    <select name="status">
+        <option value="">Vše</option>
+        <option value="ZADANO">Zadáno</option>
+        <option value="ROZPRACOVANO">Rozpracováno</option>
+        <option value="DOKONCENO">Dokončeno</option>
+    </select>
+
+    <label>Priorita:</label>
+    <select name="priority">
+        <option value="">Vše</option>
+        <option value="1">1 (nejvyšší)</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5 (nejnižší)</option>
+    </select>
+
+    <label>Tag:</label>
+    <select name="tag">
+        <option value="">Vše</option>
+        {% for tag in tags %}
+            <option value="{{ tag.id }}">{{ tag.name }}</option>
+        {% endfor %}
+    </select>
+    
+    <button type="submit">Filtrovat</button>
+</form>
+
+<option value="{{ tag.id }}" {% if request.GET.tag == tag.id|stringformat:"s" %}selected{% endif %}>
+    {{ tag.name }}
+</option>
+
+
+<ul>
+    {% for task in tasks %}
+        <li>
+            <strong>{{ task.title }}</strong> -
+            {{ task.get_status_display }} -
+            Priorita: {{ task.priority }}
+
+            <a href="{% url 'edit_task' task.id %}">Upravit</a>
+            <a href="{% url 'delete_task' task.id %}">Smazat</a>
+        </li>
+    {% endfor %}
+</ul>
+
+<br>
+<br>
+<br>
+<br>
+
+
+<h2>Přidat úkol</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Přidat</button>
+</form>
+
+
+</body>
+</html>
