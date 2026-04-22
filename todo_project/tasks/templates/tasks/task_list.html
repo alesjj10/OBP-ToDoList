@@ -1,3 +1,10 @@
+{% extends 'tasks/base.html' %}
+{% load custom_tags %}
+
+{% block content %}
+
+<h1>Moje úkoly</h1>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,19 +12,63 @@
 </head>
 <body>
 
-
-<div style="position: absolute; top: 10px; right: 30px; text-align: right;">
-    {% if user.is_authenticated %}
-        <p>Přihlášen jako: {{ user.username }}</p>
-
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Odhlásit se</button>
-        </form>
-    {% endif %}
+<div class="mb-3">
+    <a href="?view=list" class="btn btn-primary">List</a>
+    <a href="?view=calendar" class="btn btn-success">Kalendář</a>
 </div>
 
-<h1>Moje úkoly</h1>
+{% if view_type == "calendar" %}
+
+<h2>Kalendář ({{ month }}/{{ year }})</h2>
+
+<table class="table table-bordered text-center">
+    <thead>
+        <tr>
+            <th>Po</th>
+            <th>Út</th>
+            <th>St</th>
+            <th>Čt</th>
+            <th>Pá</th>
+            <th>So</th>
+            <th>Ne</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for week in calendar %}
+            <tr>
+                {% for day in week %}
+                    <td style="height:120px; vertical-align: top;"
+                        class="{% if day == today_day %}bg-success{% endif %}">
+                        {% if day != 0 %}
+                            <strong>{{ day }}</strong>
+
+                            <ul style="padding-left: 10px;">
+                                {% for task in tasks_by_day|get_item:day %}
+                                    <li style="font-size: 12px;"
+                                        class="
+                                        {% if task.priority == 1 %}bg-danger
+                                        {% elif task.priority == 2 %}bg-warning
+                                        {% endif %}
+                                    ">
+                                        {{ task.title }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Bez termínu</h3>
+<ul>
+    {% for task in tasks_no_date %}
+        <li>{{ task.title }}</li>
+    {% endfor %}
+</ul>
+{% else %}
 
 <h2>Filtr</h2>
 
@@ -56,33 +107,59 @@
 </option>
 
 
-<ul>
+<ul class="list-group">
     {% for task in tasks %}
-        <li>
-            <strong>{{ task.title }}</strong> -
-            {{ task.get_status_display }} -
-            Priorita: {{ task.priority }}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
 
-            <a href="{% url 'edit_task' task.id %}">Upravit</a>
-            <a href="{% url 'delete_task' task.id %}">Smazat</a>
+            <div>
+                {% if task.status == "DOKONCENO" %}
+                    <s>{{ task.title }}</s>
+                {% else %}
+                    <span class="fw-bold">{{ task.title }}</span>
+                {% endif %}
+
+                <br>
+                <small>
+                    {{ task.get_status_display }} | 
+                    <span class="
+                        {% if task.priority == 1 %}bg-danger
+                        {% elif task.priority == 2 %}bg-warning
+                        {% elif task.priority == 3 %}text-primary
+                        {% elif task.priority == 4 %}text-info
+                        {% else %}text-secondary
+                        {% endif %}
+                    ">
+                        Priorita: {{ task.priority }}
+                    </span>
+                </small>
+            </div>
+
+            <div>
+                {% if task.status != "DOKONCENO" %}
+                    <a class="btn btn-success btn-sm" href="{% url 'complete_task' task.id %}">✔</a>
+                {% endif %}
+
+                <a class="btn btn-warning btn-sm" href="{% url 'edit_task' task.id %}">✏️</a>
+                <a class="btn btn-danger btn-sm" href="{% url 'delete_task' task.id %}">🗑</a>
+            </div>
+
+        </li>
+    {% empty %}
+        <li class="list-group-item">
+            <div class="alert alert-info">
+                Nemáš žádné úkoly 👍<br>
+                Klikni na „Přidat úkol“
+            </div>    
         </li>
     {% endfor %}
 </ul>
 
-<br>
-<br>
-<br>
-<br>
 
-
-<h2>Přidat úkol</h2>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Přidat</button>
-</form>
 
 
 </body>
 </html>
+
+{% endif %}
+
+{% endblock %}

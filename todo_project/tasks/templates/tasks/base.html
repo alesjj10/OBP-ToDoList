@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ToDo App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light px-3">
+    <div class="container-fluid">
+
+        <!-- Levá část -->
+        <div>
+            <a class="navbar-brand fw-bold 
+                {% if request.path == '/' %}text-primary{% endif %}" 
+                href="/">
+                Moje úkoly
+            </a>
+
+            <a class="btn btn-outline-primary me-2 
+                {% if request.path == '/add/' %}active{% endif %}" 
+                href="{% url 'add_task' %}">
+                Přidat úkol
+            </a>
+
+            <a class="btn btn-outline-secondary 
+                {% if request.path == '/stats/' %}active{% endif %}" 
+                href="/stats/">
+                Statistiky
+            </a>
+        </div>
+
+        <!-- Pravá část -->
+        <div>
+            {% if user.is_authenticated %}
+                <span class="me-2">Přihlášen: {{ user.username }}</span>
+
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button class="btn btn-danger btn-sm" type="submit">Odhlásit se</button>
+                </form>
+            {% endif %}
+        </div>
+
+    </div>
+</nav>
+
+
+<!-- OBSAH -->
+<div class="container mt-4">
+    {% block content %}
+    {% endblock %}
+</div>
+
+</body>
+</html>

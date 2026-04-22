@@ -1,0 +1,46 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+
+<h1>Statistiky</h1>
+
+<p>Celkem: {{ total }}</p>
+<p>Dokončeno: {{ completed }}</p>
+<p>Rozpracováno: {{ in_progress }}</p>
+<p>Zadáno: {{ todo }}</p>
+
+<h2>Stavy</h2>
+<canvas id="statusChart" width="400" height="200"></canvas>
+
+<h2>Priority</h2>
+<canvas id="priorityChart" width="400" height="200"></canvas>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // STATUS CHART (koláčový)
+    const statusChart = new Chart(document.getElementById('statusChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Zadáno', 'Rozpracováno', 'Dokončeno'],
+            datasets: [{
+                data: [{{ todo }}, {{ in_progress }}, {{ completed }}],
+            }]
+        }
+    });
+
+    // PRIORITY CHART (sloupcový)
+    const priorityChart = new Chart(document.getElementById('priorityChart'), {
+        type: 'bar',
+        data: {
+            labels: ['1', '2', '3', '4', '5'],
+            datasets: [{
+                label: 'Počet úkolů',
+                data: {{ priority_counts }},
+            }]
+        }
+    });
+</script>
+
+{% endblock %}
