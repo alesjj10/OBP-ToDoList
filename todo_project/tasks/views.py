@@ -24,11 +24,25 @@ def task_list(request):
     tasks_no_date = []
 
     today = date.today()
-    year = today.year
-    month = today.month
+    month = int(request.GET.get('month', today.month))
+    year = int(request.GET.get('year', today.year))
+
 
     cal = calendar.monthcalendar(year, month)
 
+    prev_month = month - 1
+    next_month = month + 1
+
+    prev_year = year
+    next_year = year
+
+    if prev_month == 0:
+        prev_month = 12
+        prev_year -= 1
+
+    if next_month == 13:
+        next_month = 1
+        next_year += 1
 
     if status:
         tasks = tasks.filter(status=status)
@@ -79,6 +93,13 @@ def task_list(request):
         'month': month,
         'year': year,
         'today_day': today.day,
+        'today_month': today.month,
+        'today_year': today.year,
+        'prev_month': prev_month,
+        'next_month': next_month,
+        'prev_year': prev_year,
+        'next_year': next_year,
+        'month_name': calendar.month_name[month],
     })
 
 

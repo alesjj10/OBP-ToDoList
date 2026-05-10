@@ -19,55 +19,108 @@
 
 {% if view_type == "calendar" %}
 
-<h2>Kalendář ({{ month }}/{{ year }})</h2>
+<div class="row">
 
-<table class="table table-bordered text-center">
-    <thead>
-        <tr>
-            <th>Po</th>
-            <th>Út</th>
-            <th>St</th>
-            <th>Čt</th>
-            <th>Pá</th>
-            <th>So</th>
-            <th>Ne</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for week in calendar %}
-            <tr>
-                {% for day in week %}
-                    <td style="height:120px; vertical-align: top;"
-                        class="{% if day == today_day %}bg-success{% endif %}">
-                        {% if day != 0 %}
-                            <strong>{{ day }}</strong>
+    <!-- LEVÁ ČÁST -->
+    <div class="col-md-10">
 
-                            <ul style="padding-left: 10px;">
-                                {% for task in tasks_by_day|get_item:day %}
-                                    <li style="font-size: 12px;"
-                                        class="
-                                        {% if task.priority == 1 %}bg-danger
-                                        {% elif task.priority == 2 %}bg-warning
-                                        {% endif %}
-                                    ">
-                                        {{ task.title }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </td>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <a class="btn btn-outline-secondary"
+            href="?view=calendar&month={{ prev_month }}&year={{ prev_year }}">
+                ←
+            </a>
+
+            <h2>{{ month_name }} {{ year }}</h2>
+
+            <a class="btn btn-outline-secondary"
+            href="?view=calendar&month={{ next_month }}&year={{ next_year }}">
+                →
+            </a>
+
+        </div>
+
+        <table class="table table-bordered text-center rounded overflow-hidden">
+            <thead>
+                <tr>
+                    <th>Po</th>
+                    <th>Út</th>
+                    <th>St</th>
+                    <th>Čt</th>
+                    <th>Pá</th>
+                    <th>So</th>
+                    <th>Ne</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for week in calendar %}
+                    <tr>
+                        {% for day in week %}
+                            <td style="height:120px; vertical-align: top;"
+                                class="{% if day == today_day and month == today_month and year == today_year %}bg-success{% endif %}">
+                                {% if day != 0 %}
+                                    <strong>{{ day }}</strong>
+
+                                    <ul style="padding-left: 10px;">
+                                        {% for task in tasks_by_day|get_item:day %}
+                                            <li style="font-size: 12px; list-style: none;">
+
+                                                <span class="
+                                                    px-2 py-1 rounded fw-bold text-dark
+
+                                                    {% if task.priority == 1 %}
+                                                        bg-danger text-white
+                                                    {% elif task.priority == 2 %}
+                                                        bg-warning
+                                                    {% elif task.priority == 3 %}
+                                                        bg-primary text-white
+                                                    {% elif task.priority == 4 %}
+                                                        bg-info
+                                                    {% else %}
+                                                        bg-secondary text-white
+                                                    {% endif %}
+                                                ">
+                                                    {{ task.title }}
+                                                </span>
+
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
                 {% endfor %}
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+            </tbody>
+        </table>
 
-<h3>Bez termínu</h3>
-<ul>
-    {% for task in tasks_no_date %}
-        <li>{{ task.title }}</li>
-    {% endfor %}
-</ul>
+    </div>
+
+    <!-- PRAVÁ ČÁST -->
+    <div class="col-md-2">
+        <div class="card shadow border-0">
+            <div class="card-header fw-bold">
+                Bez termínu
+            </div>
+
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    {% for task in tasks_no_date %}
+                        <li class="mb-2">
+                            {{ task.title }}
+                        </li>
+                    {% empty %}
+                        <li>Žádné úkoly</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
 {% else %}
 
 <h2>Filtr</h2>
@@ -107,52 +160,120 @@
 </option>
 
 
-<ul class="list-group">
-    {% for task in tasks %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
+<table class="table table-hover align-middle">
 
-            <div>
+    <thead class="table-light">
+        <tr>
+            <th>Název</th>
+            <th>Stav</th>
+            <th>Priorita</th>
+            <th>Termín</th>
+            <th>Tagy</th>
+            <th>Akce</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for task in tasks %}
+        <tr>
+
+            <!-- Název -->
+            <td>
                 {% if task.status == "DOKONCENO" %}
-                    <s>{{ task.title }}</s>
+                    <s class="fw-bold">{{ task.title }}</s>
                 {% else %}
                     <span class="fw-bold">{{ task.title }}</span>
                 {% endif %}
+            </td>
 
-                <br>
-                <small>
-                    {{ task.get_status_display }} | 
-                    <span class="
-                        {% if task.priority == 1 %}bg-danger
-                        {% elif task.priority == 2 %}bg-warning
-                        {% elif task.priority == 3 %}text-primary
-                        {% elif task.priority == 4 %}text-info
-                        {% else %}text-secondary
-                        {% endif %}
-                    ">
-                        Priorita: {{ task.priority }}
+            <!-- Stav -->
+            <td>
+                {{ task.get_status_display }}
+            </td>
+
+            <!-- Priorita -->
+            <td>
+
+                <span class="
+                    px-2 py-1 rounded fw-bold
+
+                    {% if task.priority == 1 %}
+                        bg-danger text-white
+                    {% elif task.priority == 2 %}
+                        bg-warning
+                    {% elif task.priority == 3 %}
+                        bg-primary text-white
+                    {% elif task.priority == 4 %}
+                        bg-info
+                    {% else %}
+                        bg-secondary text-white
+                    {% endif %}
+                ">
+                    {{ task.priority }}
+                </span>
+
+            </td>
+
+            <!-- Termín -->
+            <td>
+                {% if task.due_date %}
+                    {{ task.due_date }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+
+            <!-- Tagy -->
+            <td>
+                {% for tag in task.tags.all %}
+                    <span class="badge bg-success">
+                        {{ tag.name }}
                     </span>
-                </small>
-            </div>
+                {% empty %}
+                    —
+                {% endfor %}
+            </td>
 
-            <div>
+            <!-- Akce -->
+            <td>
+
                 {% if task.status != "DOKONCENO" %}
-                    <a class="btn btn-success btn-sm" href="{% url 'complete_task' task.id %}">✔</a>
+                    <a class="btn btn-success btn-sm"
+                       href="{% url 'complete_task' task.id %}">
+                        ✔
+                    </a>
                 {% endif %}
 
-                <a class="btn btn-warning btn-sm" href="{% url 'edit_task' task.id %}">✏️</a>
-                <a class="btn btn-danger btn-sm" href="{% url 'delete_task' task.id %}">🗑</a>
-            </div>
+                <a class="btn btn-warning btn-sm"
+                   href="{% url 'edit_task' task.id %}">
+                    ✏️
+                </a>
 
-        </li>
+                <a class="btn btn-danger btn-sm"
+                   href="{% url 'delete_task' task.id %}">
+                    🗑
+                </a>
+
+            </td>
+
+        </tr>
+
     {% empty %}
-        <li class="list-group-item">
-            <div class="alert alert-info">
-                Nemáš žádné úkoly 👍<br>
-                Klikni na „Přidat úkol“
-            </div>    
-        </li>
+
+        <tr>
+            <td colspan="6">
+                <div class="alert alert-info mb-0">
+                    Nemáš žádné úkoly
+                </div>
+            </td>
+        </tr>
+
     {% endfor %}
-</ul>
+
+    </tbody>
+
+</table>
 
 
 
