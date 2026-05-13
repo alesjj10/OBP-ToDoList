@@ -20,6 +20,7 @@ def task_list(request):
     status = request.GET.get('status')
     priority = request.GET.get('priority')
     tag = request.GET.get('tag')
+    search = request.GET.get('search')
     calendar_tasks = defaultdict(list)
     tasks_no_date = []
 
@@ -80,6 +81,7 @@ def task_list(request):
             if task.due_date.year == year and task.due_date.month == month:
                 tasks_by_day[task.due_date.day].append(task)
 
+    
 
     return render(request, 'tasks/task_list.html', {
         'tasks': tasks,
@@ -100,6 +102,8 @@ def task_list(request):
         'prev_year': prev_year,
         'next_year': next_year,
         'month_name': calendar.month_name[month],
+        'month_number': f"{month}.",
+        'today': today,
     })
 
 
@@ -140,12 +144,22 @@ def stats(request):
     for task in tasks:
         priority_counts[task.priority - 1] += 1
 
+    total_tasks = tasks.count()
+
+    completed_tasks = tasks.filter(status='DOKONCENO').count()
+
+    in_progress_tasks = tasks.filter(status='ROZPRACOVANO').count()
+
     return render(request, 'tasks/stats.html', {
         'total': total,
         'completed': completed,
         'in_progress': in_progress,
         'todo': todo,
         'priority_counts': priority_counts,
+        'total_tasks': total_tasks,
+        'completed_tasks': completed_tasks,
+        'in_progress_tasks': in_progress_tasks,
+
     })
 
 @login_required

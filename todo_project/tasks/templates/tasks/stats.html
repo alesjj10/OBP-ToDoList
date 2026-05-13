@@ -4,19 +4,54 @@
 
 <h1>Statistiky</h1>
 
-<p>Celkem: {{ total }}</p>
-<p>Dokončeno: {{ completed }}</p>
-<p>Rozpracováno: {{ in_progress }}</p>
-<p>Zadáno: {{ todo }}</p>
+<div class="row mb-4">
 
-<h2>Stavy</h2>
-<canvas id="statusChart" width="400" height="200"></canvas>
+    <div class="col-md-4">
+        <div class="card shadow border-0 text-center p-3">
+            <h5>Celkem úkolů</h5>
+            <h2>{{ total_tasks }}</h2>
+        </div>
+    </div>
 
-<h2>Priority</h2>
-<canvas id="priorityChart" width="400" height="200"></canvas>
+    <div class="col-md-4">
+        <div class="card shadow border-0 text-center p-3">
+            <h5>Dokončeno</h5>
+            <h2>{{ completed_tasks }}</h2>
+        </div>
+    </div>
 
-<!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="col-md-4">
+        <div class="card shadow border-0 text-center p-3">
+            <h5>Rozpracováno</h5>
+            <h2>{{ in_progress_tasks }}</h2>
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-md-6">
+        <div class="card shadow border-0 p-3">
+            <h5 class="text-center mb-3">
+                Úkoly podle stavu
+            </h5>
+
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow border-0 p-3">
+            <h5 class="text-center mb-3">
+                Úkoly podle priority
+            </h5>
+
+            <canvas id="priorityChart"></canvas>
+        </div>
+    </div>
+
+</div>
 
 <script>
     // STATUS CHART (koláčový)

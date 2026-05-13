@@ -17,6 +17,27 @@
     <a href="?view=calendar" class="btn btn-success">Kalendář</a>
 </div>
 
+<form method="GET" class="mb-4">
+
+    <div class="input-group">
+
+        <input
+            type="text"
+            name="search"
+            class="form-control"
+            placeholder="Hledat úkol..."
+            value="{{ request.GET.search }}"
+        >
+
+        <button class="btn btn-success" type="submit">
+            Hledat
+        </button>
+
+    </div>
+
+</form>
+
+
 {% if view_type == "calendar" %}
 
 <div class="row">
@@ -31,7 +52,11 @@
                 ←
             </a>
 
-            <h2>{{ month_name }} {{ year }}</h2>
+            {% if request.GET.month_format == "number" %}
+                <h2>{{ month_number }} {{ year }}</h2>
+            {% else %}
+                <h2>{{ month_name }} {{ year }}</h2>
+            {% endif %}
 
             <a class="btn btn-outline-secondary"
             href="?view=calendar&month={{ next_month }}&year={{ next_year }}">
@@ -57,7 +82,7 @@
                     <tr>
                         {% for day in week %}
                             <td style="height:120px; vertical-align: top;"
-                                class="{% if day == today_day and month == today_month and year == today_year %}bg-success{% endif %}">
+                                class="{% if day == today_day and month == today_month and year == today_year %}border border-success border-3{% endif %}">
                                 {% if day != 0 %}
                                     <strong>{{ day }}</strong>
 
@@ -65,8 +90,23 @@
                                         {% for task in tasks_by_day|get_item:day %}
                                             <li style="font-size: 12px; list-style: none;">
 
-                                                <span class="
+                                                <span
+
+                                                title="
+                                                {{ task.title }}
+                                                Stav: {{ task.get_status_display }}
+                                                Priorita: {{ task.priority }}
+                                                {% if task.due_date %}
+                                                Termín: {{ task.due_date|date:'d.m.Y' }}
+                                                {% endif %}
+                                                "
+
+                                                class="
                                                     px-2 py-1 rounded fw-bold text-dark
+
+                                                    {% if task.due_date and task.due_date.date < today and task.status != "DOKONCENO" %}
+                                                        border border-danger border-2
+                                                    {% endif %}
 
                                                     {% if task.priority == 1 %}
                                                         bg-danger text-white
@@ -218,7 +258,7 @@
             <!-- Termín -->
             <td>
                 {% if task.due_date %}
-                    {{ task.due_date }}
+                    {{ task.due_date|date:"d.m.Y" }}
                 {% else %}
                     —
                 {% endif %}
@@ -251,7 +291,8 @@
                 </a>
 
                 <a class="btn btn-danger btn-sm"
-                   href="{% url 'delete_task' task.id %}">
+                    href="{% url 'delete_task' task.id %}"
+                    onclick="return confirm('Opravdu chceš smazat tento úkol?')">
                     🗑
                 </a>
 

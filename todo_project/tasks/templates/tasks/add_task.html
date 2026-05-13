@@ -2,12 +2,53 @@
 
 {% block content %}
 
-<h1>Přidat úkol</h1>
+<div class="col-md-8 mx-auto">
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Přidat</button>
-</form>
+    <div class="card shadow border-0 p-4">
+
+        <h1 class="mb-4">Přidat úkol</h1>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Název</label>
+                {{ form.title }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Popis</label>
+                {{ form.description }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Termín</label>
+                {{ form.due_date }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Priorita</label>
+                {{ form.priority }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Stav</label>
+                {{ form.status }}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Tagy</label>
+                {{ form.tags }}
+            </div>
+
+            <button class="btn btn-success px-4" type="submit">
+                Přidat
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
 
 {% endblock %}
