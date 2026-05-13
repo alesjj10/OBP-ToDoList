@@ -17,26 +17,6 @@
     <a href="?view=calendar" class="btn btn-success">Kalendář</a>
 </div>
 
-<form method="GET" class="mb-4">
-
-    <div class="input-group">
-
-        <input
-            type="text"
-            name="search"
-            class="form-control"
-            placeholder="Hledat úkol..."
-            value="{{ request.GET.search }}"
-        >
-
-        <button class="btn btn-success" type="submit">
-            Hledat
-        </button>
-
-    </div>
-
-</form>
-
 
 {% if view_type == "calendar" %}
 
